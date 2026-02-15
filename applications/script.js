@@ -26,14 +26,14 @@ const noApplicationFoundText = document.querySelector('.no_applications_found');
 const applicationDetailsMain = document.querySelector(
   '.application-details-main',
 );
-const applicationAcceptButton = document.querySelector(
-  '.application-details-accept',
+const applicationAcceptButton = document.getElementById(
+  'application-details-accept',
 );
-const applicationRejectButton = document.querySelector(
-  '.application-details-reject',
+const applicationRejectButton = document.getElementById(
+  'application-details-reject',
 );
-const applicationRequestChangesButton = document.querySelector(
-  '.application-details-request-changes',
+const applicationRequestChangesButton = document.getElementById(
+  'application-details-request-changes',
 );
 
 const applyFilterButton = document.getElementById('apply-filter-button');
@@ -41,8 +41,8 @@ const applicationContainer = document.querySelector('.application-container');
 const clearButton = document.getElementById('clear-button');
 const lastElementContainer = document.getElementById('page_bottom_element');
 
-const applicationDetailsActionsContainer = document.querySelector(
-  '.application-details-actions',
+const applicationDetailsActionsContainer = document.getElementById(
+  'application-details-actions',
 );
 const urlParams = new URLSearchParams(window.location.search);
 const isDev = urlParams.get('dev') === 'true';
@@ -122,7 +122,35 @@ function updateUserApplication({ status }) {
         type: 'success',
         message: res.message || 'Application updated successfully!',
       });
-      setTimeout(() => closeApplicationDetails(), 1000);
+
+      applicationAcceptButton.classList.add('hidden');
+      applicationRejectButton.classList.add('hidden');
+      applicationRequestChangesButton.classList.add('hidden');
+
+      if (status === 'accepted') {
+        const acceptedMsg = createElement({
+          type: 'p',
+          attributes: { class: 'application-details-accepted-msg' },
+          innerText: 'Application was already accepted',
+        });
+        applicationDetailsActionsContainer.append(acceptedMsg);
+      } else if (status === 'rejected') {
+        const rejectedMsg = createElement({
+          type: 'p',
+          attributes: { class: 'application-details-rejected-msg' },
+          innerText: 'Application is already rejected',
+        });
+        applicationDetailsActionsContainer.append(rejectedMsg);
+      } else if (status === 'changes_requested') {
+        const changesRequestedMsg = createElement({
+          type: 'p',
+          attributes: { class: 'application-details-changes-requested-msg' },
+          innerText: 'Changes were already requested',
+        });
+        applicationDetailsActionsContainer.append(changesRequestedMsg);
+      }
+
+      setTimeout(() => closeApplicationDetails(), 3000);
     })
     .catch((error) => {
       showToastMessage({

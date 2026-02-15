@@ -125,9 +125,14 @@
           />
         </button>
         <div class="application-details-main"></div>
-        <div class="application-details-actions">
+        <div
+          class="application-details-actions"
+          id="application-details-actions"
+        >
           <button
             class="application-details-accept"
+            id="application-details-accept"
+            data-testid="application-details-accept"
             aria-label="Accept Application"
           >
             Accept
@@ -135,11 +140,15 @@
           <button
             class="application-details-request-changes"
             aria-label="Request changes for this application"
+            id="application-details-request-changes"
+            data-testid="application-details-request-changes"
           >
             Request Changes
           </button>
           <button
             class="application-details-reject"
+            id="application-details-reject"
+            data-testid="application-details-reject"
             aria-label="Reject Application"
           >
             Reject

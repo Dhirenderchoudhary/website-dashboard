@@ -630,7 +630,8 @@ body {
 }
 
 .application-details-accepted-msg,
-.application-details-rejected-msg {
+.application-details-rejected-msg,
+.application-details-changes-requested-msg {
   font-weight: bold;
   font-size: 18px;
   width: 100%;
@@ -643,6 +644,10 @@ body {
 
 .application-details-rejected-msg {
   color: var(--color-rejected);
+}
+
+.application-details-changes-requested-msg {
+  color: var(--color-pending);
 }
 
 .unauthorized-text {
