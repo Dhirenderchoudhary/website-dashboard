@@ -408,4 +408,122 @@ describe('Applications page', () => {
       'Application feedback submitted successfully',
     );
   });
+
+  it('should show error toast when requesting changes without providing feedback', async function () {
+    await page.goto(
+      `${LOCAL_TEST_PAGE_URL}/applications?dev=true&status=pending`,
+    );
+    await page.waitForSelector('.application-card');
+    await page.click('.application-card');
+
+    await page.$eval('.application-textarea', (el) => (el.value = ''));
+    await page.click('#application-details-request-changes');
+    await page.waitForSelector('[data-testid="toast-component"].show');
+    const toastComponent = await page.$('[data-testid="toast-component"]');
+    expect(
+      await toastComponent.evaluate((el) => el.classList.contains('show')),
+    ).toBe(true);
+    expect(
+      await toastComponent.evaluate((el) =>
+        el.classList.contains('error__toast'),
+      ),
+    ).toBe(true);
+    const toastMessage = await page.$('[data-testid="toast-message"]');
+    expect(await toastMessage.evaluate((el) => el.textContent)).toBe(
+      'Please provide feedback before requesting changes.',
+    );
+  });
+
+  it('should hide action buttons after successfully requesting changes', async function () {
+    await page.goto(
+      `${LOCAL_TEST_PAGE_URL}/applications?dev=true&status=pending`,
+    );
+    await page.waitForSelector('.application-card');
+    await page.click('.application-card');
+
+    await page.type(
+      '.application-textarea',
+      'Please update your introduction.',
+    );
+
+    await page.click('#application-details-request-changes');
+    await page.waitForSelector('[data-testid="toast-component"].show');
+
+    const acceptBtn = await page.$('#application-details-accept');
+    const rejectBtn = await page.$('#application-details-reject');
+    const requestChangesBtn = await page.$(
+      '#application-details-request-changes',
+    );
+
+    expect(
+      await acceptBtn.evaluate((el) => el.classList.contains('hidden')),
+    ).toBe(true);
+    expect(
+      await rejectBtn.evaluate((el) => el.classList.contains('hidden')),
+    ).toBe(true);
+    expect(
+      await requestChangesBtn.evaluate((el) => el.classList.contains('hidden')),
+    ).toBe(true);
+  });
+
+  it('should display "Changes were already requested" message after successfully requesting changes', async function () {
+    await page.goto(
+      `${LOCAL_TEST_PAGE_URL}/applications?dev=true&status=pending`,
+    );
+    await page.waitForSelector('.application-card');
+    await page.click('.application-card');
+
+    await page.type(
+      '.application-textarea',
+      'Please update your introduction.',
+    );
+
+    await page.click('#application-details-request-changes');
+    await page.waitForSelector('[data-testid="toast-component"].show');
+
+    const statusMsg = await page.$(
+      '.application-details-changes-requested-msg',
+    );
+    expect(statusMsg).toBeTruthy();
+    expect(await statusMsg.evaluate((el) => el.textContent)).toBe(
+      'Changes were already requested',
+    );
+  });
+
+  it('should send correct PATCH request when requesting changes', async function () {
+    let feedbackRequestBody = null;
+    let feedbackRequestMethod = null;
+
+    await page.goto(
+      `${LOCAL_TEST_PAGE_URL}/applications?dev=true&status=pending`,
+    );
+    await page.waitForSelector('.application-card');
+
+    page.on('request', (request) => {
+      if (
+        request.url().includes('/applications/') &&
+        request.url().includes('/feedback')
+      ) {
+        feedbackRequestMethod = request.method();
+        feedbackRequestBody = JSON.parse(request.postData());
+      }
+    });
+
+    await page.click('.application-card');
+
+    await page.$eval('.application-textarea', (el) => (el.value = ''));
+    await page.type(
+      '.application-textarea',
+      'Please update your introduction.',
+    );
+
+    await page.click('#application-details-request-changes');
+    await page.waitForSelector('[data-testid="toast-component"].show');
+
+    expect(feedbackRequestMethod).toBe('PATCH');
+    expect(feedbackRequestBody).toEqual({
+      status: 'changes_requested',
+      feedback: 'Please update your introduction.',
+    });
+  });
 });
