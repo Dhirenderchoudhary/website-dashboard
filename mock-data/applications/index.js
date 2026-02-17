@@ -31,7 +31,13 @@ const fetchedApplications = [
       skills: 'REACT, NODE JS',
       institution: 'Christ church college',
     },
-    feedback: 'estee',
+    feedback: [
+      {
+        feedback: 'estee',
+        reviewerName: 'Reviewer',
+        createdAt: '2023-12-20T10:00:00.000Z',
+      },
+    ],
     status: 'accepted',
   },
   {
@@ -367,8 +373,48 @@ const pendingApplications = [
   },
 ];
 
+const changesRequestedApplications = [
+  {
+    id: 'lavEduxsb2C5Bl4s289P',
+    createdAt: '2023-12-19T00:23:07.865Z',
+    score: 70,
+    nudgeCount: 4,
+    intro: {
+      funFact: 'fun fact text',
+      forFun: 'for fun text',
+      numberOfHours: 14,
+      whyRds: 'why rds text',
+      introduction: 'introduction text',
+    },
+    biodata: {
+      firstName: 'sixth',
+      lastName: 'trivedi',
+    },
+    location: {
+      country: 'India',
+      city: 'Kanpur',
+      state: 'UP',
+    },
+    foundFrom: 'twitter',
+    userId: 'hKzs2IQGe4sLnAuSZ85i',
+    professional: {
+      skills: 'REACT, NODE JS',
+      institution: 'Christ church college',
+    },
+    feedback: [
+      {
+        feedback: 'Please update your introduction.',
+        reviewerName: 'Admin',
+        createdAt: '2023-12-20T10:00:00.000Z',
+      },
+    ],
+    status: 'changes_requested',
+  },
+];
+
 module.exports = {
   fetchedApplications,
   acceptedApplications,
   pendingApplications,
+  changesRequestedApplications,
 };

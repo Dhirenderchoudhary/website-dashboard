@@ -329,16 +329,50 @@ function openApplicationDetails(application) {
     innerText: 'Add Feedback',
   });
 
-  let feedbackText = '';
-  if (typeof application.feedback === 'string') {
-    feedbackText = application.feedback;
-  } else if (Array.isArray(application.feedback)) {
-    feedbackText = application.feedback
-      .map((f) => (typeof f === 'string' ? f : f.feedback || ''))
-      .filter((f) => f)
-      .join('\n');
-  } else if (application.feedback && typeof application.feedback === 'object') {
-    feedbackText = application.feedback.feedback || '';
+  const feedbackList = Array.isArray(application.feedback)
+    ? application.feedback
+    : [];
+
+  if (feedbackList.length > 0) {
+    const feedbackListContainer = createElement({
+      type: 'div',
+      attributes: { class: 'feedback-list' },
+    });
+
+    feedbackList.forEach((item) => {
+      const feedbackContent = typeof item === 'string' ? item : item.feedback;
+      const feedbackMeta = typeof item === 'object' ? item : {};
+
+      if (!feedbackContent) return;
+
+      const itemEl = createElement({
+        type: 'div',
+        attributes: { class: 'feedback-item' },
+      });
+
+      if (feedbackMeta.reviewerName || feedbackMeta.createdAt) {
+        const metaEl = createElement({
+          type: 'div',
+          attributes: { class: 'feedback-meta' },
+        });
+        const dateStr = feedbackMeta.createdAt
+          ? new Date(feedbackMeta.createdAt).toLocaleDateString()
+          : '';
+        const reviewer = feedbackMeta.reviewerName || 'Reviewer';
+        metaEl.innerText = `${reviewer} • ${dateStr}`;
+        itemEl.appendChild(metaEl);
+      }
+
+      const textEl = createElement({
+        type: 'p',
+        attributes: { class: 'feedback-text' },
+      });
+      textEl.innerText = feedbackContent;
+      itemEl.appendChild(textEl);
+      feedbackListContainer.appendChild(itemEl);
+    });
+
+    applicationSection.appendChild(feedbackListContainer);
   }
 
   const applicationTextArea = createElement({
@@ -347,7 +381,7 @@ function openApplicationDetails(application) {
       class: 'application-textarea',
       placeHolder: 'Add Feedback here',
     },
-    innerText: feedbackText,
+    innerText: '',
   });
 
   applicationSection.appendChild(applicationSectionTitle);
@@ -382,21 +416,6 @@ function openApplicationDetails(application) {
       innerText: 'Application was already accepted',
     });
     applicationDetailsActionsContainer.append(applicationDetailsAcceptedMsg);
-  } else if (currentStatus === 'changes_requested') {
-    applicationAcceptButton.classList.add('hidden');
-    applicationRejectButton.classList.add('hidden');
-    applicationRequestChangesButton.classList.add('hidden');
-
-    const applicationDetailsChangesRequestedMsg = createElement({
-      type: 'p',
-      attributes: {
-        class: 'application-details-changes-requested-msg',
-      },
-      innerText: 'Changes were already requested',
-    });
-    applicationDetailsActionsContainer.append(
-      applicationDetailsChangesRequestedMsg,
-    );
   } else {
     applicationRejectButton.disabled = false;
     applicationRejectButton.style.cursor = 'pointer';

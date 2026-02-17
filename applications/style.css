@@ -471,6 +471,10 @@ body {
   background-color: var(--color-rejected);
 }
 
+.description.status-changes_requested {
+  background-color: var(--color-pending);
+}
+
 .application-highlights {
   display: flex;
   gap: 1.25rem;
@@ -797,4 +801,39 @@ body {
     .application-highlight-item {
     min-width: auto;
   }
+}
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid var(--light-gray-color);
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.feedback-item {
+  background-color: var(--white);
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
+}
+
+.feedback-meta {
+  font-size: 11px;
+  color: var(--color-gray);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.feedback-text {
+  font-size: 14px;
+  color: var(--black-color);
+  margin: 0;
+  white-space: pre-wrap;
 }

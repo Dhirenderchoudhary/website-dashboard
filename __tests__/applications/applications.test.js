@@ -4,6 +4,7 @@ const {
   fetchedApplications,
   acceptedApplications,
   pendingApplications,
+  changesRequestedApplications,
 } = require('../../mock-data/applications');
 const { superUserForAudiLogs } = require('../../mock-data/users');
 const {
@@ -113,6 +114,23 @@ describe('Applications page', () => {
           body: JSON.stringify({
             applications: pendingApplications,
             totalCount: pendingApplications.length,
+          }),
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          },
+        });
+      } else if (
+        url ===
+        `${STAGING_API_URL}/applications?size=6&status=changes_requested&dev=true`
+      ) {
+        interceptedRequest.respond({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            applications: changesRequestedApplications,
+            totalCount: changesRequestedApplications.length,
           }),
           headers: {
             'Access-Control-Allow-Origin': '*',
@@ -285,7 +303,7 @@ describe('Applications page', () => {
 
   it.skip('should show toast message with application updated successfully', async function () {
     await page.click('.view-details-button');
-    await page.click('.application-details-accept');
+    await page.click('[data-testid="application-details-accept"]');
     const toast = await page.$('#toast');
     expect(await toast.evaluate((el) => el.classList.contains('hidden'))).toBe(
       false,
@@ -334,7 +352,7 @@ describe('Applications page', () => {
     await page.waitForSelector('.application-card');
     await page.click('.application-card');
 
-    await page.click('.application-details-accept');
+    await page.click('[data-testid="application-details-accept"]');
     await page.waitForSelector('[data-testid="toast-component"].show');
     const toastComponent = await page.$('[data-testid="toast-component"]');
     expect(
@@ -384,7 +402,7 @@ describe('Applications page', () => {
       'Please update your introduction.',
     );
 
-    await page.click('#application-details-request-changes');
+    await page.click('[data-testid="application-details-request-changes"]');
     await page.waitForSelector('[data-testid="toast-component"].show');
     const toastComponent = await page.$('[data-testid="toast-component"]');
     expect(
@@ -417,7 +435,7 @@ describe('Applications page', () => {
     await page.click('.application-card');
 
     await page.$eval('.application-textarea', (el) => (el.value = ''));
-    await page.click('#application-details-request-changes');
+    await page.click('[data-testid="application-details-request-changes"]');
     await page.waitForSelector('[data-testid="toast-component"].show');
     const toastComponent = await page.$('[data-testid="toast-component"]');
     expect(
@@ -434,7 +452,7 @@ describe('Applications page', () => {
     );
   });
 
-  it('should hide action buttons after successfully requesting changes', async function () {
+  it('should hide action buttons after successfully updating application status to changes_requested', async function () {
     await page.goto(
       `${LOCAL_TEST_PAGE_URL}/applications?dev=true&status=pending`,
     );
@@ -446,13 +464,17 @@ describe('Applications page', () => {
       'Please update your introduction.',
     );
 
-    await page.click('#application-details-request-changes');
+    await page.click('[data-testid="application-details-request-changes"]');
     await page.waitForSelector('[data-testid="toast-component"].show');
 
-    const acceptBtn = await page.$('#application-details-accept');
-    const rejectBtn = await page.$('#application-details-reject');
+    const acceptBtn = await page.$(
+      '[data-testid="application-details-accept"]',
+    );
+    const rejectBtn = await page.$(
+      '[data-testid="application-details-reject"]',
+    );
     const requestChangesBtn = await page.$(
-      '#application-details-request-changes',
+      '[data-testid="application-details-request-changes"]',
     );
 
     expect(
@@ -478,7 +500,7 @@ describe('Applications page', () => {
       'Please update your introduction.',
     );
 
-    await page.click('#application-details-request-changes');
+    await page.click('[data-testid="application-details-request-changes"]');
     await page.waitForSelector('[data-testid="toast-component"].show');
 
     const statusMsg = await page.$(
@@ -517,13 +539,59 @@ describe('Applications page', () => {
       'Please update your introduction.',
     );
 
-    await page.click('#application-details-request-changes');
+    await page.click('[data-testid="application-details-request-changes"]');
     await page.waitForSelector('[data-testid="toast-component"].show');
 
-    expect(feedbackRequestMethod).toBe('PATCH');
     expect(feedbackRequestBody).toEqual({
       status: 'changes_requested',
       feedback: 'Please update your introduction.',
     });
+  });
+
+  it('should display existing feedback in a list', async function () {
+    await page.click('.view-details-button');
+    await page.waitForSelector('.feedback-list');
+    const feedbackItems = await page.$$('.feedback-item');
+    expect(feedbackItems.length).toBe(1);
+
+    const feedbackText = await feedbackItems[0].$eval(
+      '.feedback-text',
+      (el) => el.innerText,
+    );
+    expect(feedbackText).toBe('estee');
+
+    const feedbackMeta = await feedbackItems[0].$eval(
+      '.feedback-meta',
+      (el) => el.innerText,
+    );
+    expect(feedbackMeta).toContain('Reviewer');
+  });
+
+  it('should show action buttons when application status is changes_requested', async function () {
+    await page.goto(
+      `${LOCAL_TEST_PAGE_URL}/applications?dev=true&status=changes_requested`,
+    );
+    await page.waitForSelector('.application-card');
+    await page.click('.application-card');
+
+    const acceptBtn = await page.$(
+      '[data-testid="application-details-accept"]',
+    );
+    const rejectBtn = await page.$(
+      '[data-testid="application-details-reject"]',
+    );
+    const requestChangesBtn = await page.$(
+      '[data-testid="application-details-request-changes"]',
+    );
+
+    expect(
+      await acceptBtn.evaluate((el) => el.classList.contains('hidden')),
+    ).toBe(false);
+    expect(
+      await rejectBtn.evaluate((el) => el.classList.contains('hidden')),
+    ).toBe(false);
+    expect(
+      await requestChangesBtn.evaluate((el) => el.classList.contains('hidden')),
+    ).toBe(false);
   });
 });
