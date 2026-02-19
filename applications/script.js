@@ -260,6 +260,12 @@ function openApplicationDetails(application) {
         title: 'For fun',
         description: application.intro.forFun,
       },
+      {
+        title: 'Last Edited',
+        description: application.updatedAt
+          ? new Date(application.updatedAt).toLocaleString()
+          : 'N/A',
+      },
     ],
   };
 
@@ -331,9 +337,18 @@ function openApplicationDetails(application) {
 
   const feedbackList = Array.isArray(application.feedback)
     ? application.feedback
+    : application.feedback
+    ? [application.feedback]
     : [];
 
   if (feedbackList.length > 0) {
+    const feedbackHistoryTitle = createElement({
+      type: 'h3',
+      attributes: { class: 'feedback-history-heading' },
+      innerText: 'Admin Feedback',
+    });
+    applicationSection.appendChild(feedbackHistoryTitle);
+
     const feedbackListContainer = createElement({
       type: 'div',
       attributes: { class: 'feedback-list' },
@@ -358,7 +373,7 @@ function openApplicationDetails(application) {
         const dateStr = feedbackMeta.createdAt
           ? new Date(feedbackMeta.createdAt).toLocaleDateString()
           : '';
-        const reviewer = feedbackMeta.reviewerName || 'Reviewer';
+        const reviewer = feedbackMeta.reviewerName || 'Admin';
         metaEl.innerText = `${reviewer} • ${dateStr}`;
         itemEl.appendChild(metaEl);
       }
@@ -536,6 +551,13 @@ function createApplicationCard({ application, dev, index }) {
   applicationCard.appendChild(introductionText);
 
   if (dev) {
+    const scoreBadge = createElement({
+      type: 'div',
+      attributes: { class: 'application-score', title: 'Application Score' },
+      innerText: `${application.score || 0}`,
+    });
+    applicationCard.appendChild(scoreBadge);
+
     applicationCard.style.cursor = 'pointer';
     applicationCard.addEventListener('click', () => {
       addQueryParamInUrl('id', application.id);
@@ -547,6 +569,13 @@ function createApplicationCard({ application, dev, index }) {
       attributes: { class: 'view-details-button' },
       innerText: 'View Details',
     });
+
+    const scoreText = createElement({
+      type: 'div',
+      attributes: { class: 'application-score-text' },
+      innerText: `Score: ${application.score || 0}`,
+    });
+    applicationCard.appendChild(scoreText);
 
     viewDetailsButton.addEventListener('click', () => {
       addQueryParamInUrl('id', application.id);
@@ -758,11 +787,6 @@ filterRemove.addEventListener('click', () => {
   changeFilter();
   const dev = urlParams.get('dev');
   renderApplicationCards(nextLink, status, true, dev);
-});
-
-backDrop.addEventListener('click', () => {
-  filterModal.classList.add('hidden');
-  backDrop.style.display = 'none';
 });
 
 backDropBlur.addEventListener('click', closeApplicationDetails);
