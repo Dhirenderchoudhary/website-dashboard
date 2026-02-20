@@ -16,6 +16,7 @@
   --color-accepted: #16a34a;
   --color-pending: #ca8a04;
   --color-rejected: #dc2626;
+  --color-changes-requested: #f87314;
 }
 
 .user-text-index {
@@ -472,7 +473,7 @@ body {
 }
 
 .description.status-changes_requested {
-  background-color: var(--color-pending);
+  background-color: var(--color-changes-requested);
 }
 
 .application-highlights {
@@ -598,14 +599,14 @@ body {
 
 #application-details-request-changes {
   background-color: white;
-  color: var(--color-pending);
+  color: var(--color-changes-requested);
   margin: 0 auto;
   width: 32%;
-  border: 2px solid var(--color-pending);
+  border: 2px solid var(--color-changes-requested);
 }
 
 #application-details-request-changes:is(:hover, :active, :focus-visible) {
-  background: var(--color-pending);
+  background: var(--color-changes-requested);
   color: var(--white);
   transition: transform 0.2s ease;
   will-change: transform;
@@ -641,7 +642,7 @@ body {
 }
 
 .application-details-changes-requested-msg {
-  color: var(--color-pending);
+  color: var(--color-changes-requested);
 }
 
 .unauthorized-text {

@@ -261,9 +261,9 @@ function openApplicationDetails(application) {
         description: application.intro.forFun,
       },
       {
-        title: 'Last Edited',
-        description: application.updatedAt
-          ? new Date(application.updatedAt).toLocaleString()
+        title: 'Last Application Edit',
+        description: application.lastEditAt
+          ? new Date(application.lastEditAt).toLocaleString()
           : 'N/A',
       },
     ],
@@ -355,35 +355,42 @@ function openApplicationDetails(application) {
     });
 
     feedbackList.forEach((item) => {
-      const feedbackContent = typeof item === 'string' ? item : item.feedback;
-      const feedbackMeta = typeof item === 'object' ? item : {};
+      const {
+        feedback: feedbackContent,
+        reviewerName,
+        createdAt,
+        status,
+      } = item;
 
-      if (!feedbackContent) return;
+      if (!feedbackContent && !status) return;
 
       const itemEl = createElement({
         type: 'div',
         attributes: { class: 'feedback-item' },
       });
 
-      if (feedbackMeta.reviewerName || feedbackMeta.createdAt) {
+      if (reviewerName || createdAt) {
         const metaEl = createElement({
           type: 'div',
           attributes: { class: 'feedback-meta' },
         });
-        const dateStr = feedbackMeta.createdAt
-          ? new Date(feedbackMeta.createdAt).toLocaleDateString()
+        const dateStr = createdAt
+          ? new Date(createdAt).toLocaleDateString()
           : '';
-        const reviewer = feedbackMeta.reviewerName || 'Admin';
+        const reviewer = reviewerName || 'Admin';
         metaEl.innerText = `${reviewer} • ${dateStr}`;
         itemEl.appendChild(metaEl);
       }
 
-      const textEl = createElement({
-        type: 'p',
-        attributes: { class: 'feedback-text' },
-      });
-      textEl.innerText = feedbackContent;
-      itemEl.appendChild(textEl);
+      if (feedbackContent) {
+        const textEl = createElement({
+          type: 'p',
+          attributes: { class: 'feedback-text' },
+        });
+        textEl.innerText = feedbackContent;
+        itemEl.appendChild(textEl);
+      }
+
       feedbackListContainer.appendChild(itemEl);
     });
 

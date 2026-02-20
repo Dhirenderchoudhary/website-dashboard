@@ -2,7 +2,7 @@ const fetchedApplications = [
   {
     id: 'lavEduxsb2C5Bl4s289P',
     createdAt: '2023-12-19T00:23:07.865Z',
-    updatedAt: '2023-12-20T10:15:30.000Z',
+    lastEditAt: '2023-12-20T10:15:30.000Z',
     score: 85,
     nudgeCount: 2,
     intro: {
@@ -33,9 +33,10 @@ const fetchedApplications = [
     },
     feedback: [
       {
-        feedback: 'estee',
+        status: 'accepted',
         reviewerName: 'Reviewer',
         createdAt: '2023-12-20T10:00:00.000Z',
+        feedback: 'estee',
       },
     ],
     status: 'accepted',
@@ -403,9 +404,10 @@ const changesRequestedApplications = [
     },
     feedback: [
       {
-        feedback: 'Please update your introduction.',
+        status: 'changes_requested',
         reviewerName: 'Admin',
         createdAt: '2023-12-20T10:00:00.000Z',
+        feedback: 'Please update your introduction.',
       },
     ],
     status: 'changes_requested',
